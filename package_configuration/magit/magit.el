@@ -47,7 +47,11 @@
 
 (after! magit
   (transient-append-suffix 'magit-tag "t"
-    '("a" "Auto Date Tag" my/magit-auto-add-and-push-date-tag)))
+    '("a" "Auto Date Tag" my/magit-auto-add-and-push-date-tag))
+	(map! :map magit-diff-mode-map :n  "RET" #'magit-diff-visit-file-other-window)
+	(map! :map magit-hunk-section-map :n  "RET" #'magit-diff-visit-file-other-window)
+	(map! :map magit-file-section-map  :n "RET" #'magit-diff-visit-file-other-window)
+	)
 
 ;; (after! magit-section
 ;; 	(defun magit-section-show (section)
