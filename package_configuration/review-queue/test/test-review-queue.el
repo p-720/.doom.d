@@ -60,6 +60,29 @@
         (expect (review-queue--get-file-and-lines)
                 :to-throw)))
 
+    (it "uses magit-buffer-file-name when visiting a magit blob (magit-diff-visit-file)"
+      (let ((tmp-dir (make-temp-file "test-repo" t)))
+        (unwind-protect
+            (progn
+              (let ((tmp-file (expand-file-name "src/test.el" tmp-dir)))
+                (make-directory (file-name-directory tmp-file) t)
+                (shell-command (format "git -C %s init -q" tmp-dir))
+                (with-temp-file tmp-file
+                  (insert "line1\nline2\nline3\n"))
+                (with-temp-buffer
+                  ;; Simulate magit blob buffer: no buffer-file-name,
+                  ;; only magit-buffer-file-name (absolute worktree path)
+                  (set (make-local-variable 'magit-buffer-file-name) tmp-file)
+                  (let ((default-directory tmp-dir))
+                    (insert "line1\nline2\nline3\n")
+                    (goto-char (point-min))
+                    (forward-line 1)
+                    (let ((result (review-queue--get-file-and-lines)))
+                      (expect (nth 0 result) :to-equal "src/test.el")
+                      (expect (nth 1 result) :to-equal 2)
+                      (expect (nth 2 result) :to-equal 2)))))
+          (delete-directory tmp-dir 'recursive)))))
+
     ;; Skip in batch mode: requires Magit's EIEIO section objects
     (it "extracts file and line from magit diff buffer (skipped in batch)"
       (assume (and (fboundp 'magit-diff--file)

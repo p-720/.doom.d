@@ -27,7 +27,12 @@
 (defun review-queue--get-file-and-lines ()
   "Return (file-path start-line end-line) from region or magit context.
 Signal error if none."
-  (let* ((buffer-file (buffer-file-name))
+  (let* ((buffer-file (or (buffer-file-name)
+                          ;; magit-diff-visit-file opens blobs (index/HEAD
+                          ;; versions) in buffers with no buffer-file-name;
+                          ;; magit-buffer-file-name holds the worktree path.
+                          (and (bound-and-true-p magit-buffer-file-name)
+                               magit-buffer-file-name)))
          (file-path nil)
          (start-line nil)
          (end-line nil))
