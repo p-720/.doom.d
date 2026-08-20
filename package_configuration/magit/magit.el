@@ -13,22 +13,23 @@
 	(remove-hook 'server-switch-hook 'magit-commit-diff)
 	(remove-hook 'with-editor-filter-visit-hook 'magit-commit-diff))
 
-(defun my/magit-auto-add-and-push-date-tag (&optional target)
-  "Create a Git tag in YYYY.MDD.N format (e.g. 2026.724.0) and push to remote."
+(defun my/magit-auto-add-and-push-date-tag (&optional target suffix-str)
+  "Create a Git tag in YYYY.MDD.N[-suffix] format (e.g. 2026.724.0 or 2026.724.0-tachyon) and push to remote."
   (interactive)
-  ;; %-m = unpadded month (7), %d = 2-digit day (24) -> 2026.724.
-  (let* ((date-prefix (format-time-string "%Y.%-m%d."))
-         (pattern (concat date-prefix "*"))
+  (let* ((suffix (or suffix-str ""))
+         ;; %-m = unpadded month (7), %d = 2-digit day (24) -> 2026.724.
+         (date-prefix (format-time-string "%Y.%-m%d."))
+         (pattern (concat date-prefix "*" suffix))
          (existing-tags (magit-git-lines "tag" "-l" pattern))
          (max-suffix -1))
-    ;; Parse existing tags matching today's prefix to find highest suffix N
+    ;; Parse existing tags matching today's prefix/suffix to find highest suffix N
     (dolist (tag existing-tags)
-      (when (string-match (concat "^" (regexp-quote date-prefix) "\\([0-9]+\\)$") tag)
+      (when (string-match (concat "^" (regexp-quote date-prefix) "\\([0-9]+\\)" (regexp-quote suffix) "$") tag)
         (let ((num (string-to-number (match-string 1 tag))))
           (when (> num max-suffix)
             (setq max-suffix num)))))
     
-    (let* ((new-tag (format "%s%d" date-prefix (1+ max-suffix)))
+    (let* ((new-tag (format "%s%d%s" date-prefix (1+ max-suffix) suffix))
            (remote (magit-read-remote "Push tag to remote" nil t)))
       (if (y-or-n-p (format "Create and push tag '%s' to '%s'%s? " 
                             new-tag 
@@ -45,13 +46,20 @@
             (message "Created and pushed tag: %s" new-tag))
         (message "Tag creation canceled.")))))
 
+(defun my/magit-auto-add-and-push-date-tag-tachyon (&optional target)
+  "Create and push a date tag with a '-tachyon' suffix."
+  (interactive)
+  (my/magit-auto-add-and-push-date-tag target "-tachyon"))
+
 (after! magit
   (transient-append-suffix 'magit-tag "t"
     '("a" "Auto Date Tag" my/magit-auto-add-and-push-date-tag))
-	(map! :map magit-diff-mode-map :n  "RET" #'magit-diff-visit-file-other-window)
-	(map! :map magit-hunk-section-map :n  "RET" #'magit-diff-visit-file-other-window)
-	(map! :map magit-file-section-map  :n "RET" #'magit-diff-visit-file-other-window)
-	)
+  (transient-append-suffix 'magit-tag "a"
+    '("p" "Auto Date Tag (-tachyon)" my/magit-auto-add-and-push-date-tag-tachyon))
+  
+  (map! :map magit-diff-mode-map :n "RET" #'magit-diff-visit-file-other-window)
+  (map! :map magit-hunk-section-map :n "RET" #'magit-diff-visit-file-other-window)
+  (map! :map magit-file-section-map :n "RET" #'magit-diff-visit-file-other-window))
 
 ;; (after! magit-section
 ;; 	(defun magit-section-show (section)

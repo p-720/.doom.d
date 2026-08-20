@@ -11,3 +11,5 @@ or terminating simple string."
 
 (add-to-list 'auto-mode-alist '("\\.cshtml$" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.csproj$" . xml-mode))
+(after! lsp-csharp
+  (setq lsp-csharp-server 'omnisharp))

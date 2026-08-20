@@ -226,6 +226,28 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
+
+;;; csharp-roslyn via nixpkgs roslyn-ls (stdio) — lighter than omnisharp
+;; lsp-roslyn.el is Windows/named-pipe centric (pins 4.13); nixpkgs
+;; roslyn-ls 5.7 requires explicit --stdio and speaks plain LSP there.
+(after! lsp-mode
+  (require 'lsp-mode)
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-stdio-connection
+                     '("/run/current-system/sw/bin/Microsoft.CodeAnalysis.LanguageServer" "--stdio"))
+    :activation-fn (lsp-activate-on "csharp")
+    :server-id 'csharp-roslyn-stdio
+    :priority 5
+    :multi-root t)))
+
+;; NB: don't set lsp-csharp-server-path to Roslyn — that var is only read by
+;; the omnisharp client (which passes -lsp). The custom client below uses its
+;; own command list.
+
+;; trust the per-project csharp-ls solution in .dir-locals.el
+(add-to-list 'safe-local-variable-values '(lsp-csharp-solution-file . "/mnt/md127/mosusu/OsuRuleset.sln"))
+
 (custom-set-variables
   ;; custom-set-variables was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
