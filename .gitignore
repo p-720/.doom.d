@@ -8,3 +8,8 @@ cache.el
 .env.el
 .env
 .aider*
+
+# stale accidental gitlinks, not real submodules (no .gitmodules entry) - keep git from re-adding them
+packages/emacs-run-command/
+packages/fennel-mode/
+packages/hygen/
