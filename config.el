@@ -116,7 +116,7 @@
 	  (load-theme +light-theme+ t)
 	  ))
 
-(setq user-full-name "p2d0")
+(setq user-full-name "p-720")
 
 ;; Fix comments in tpl mode
 
@@ -134,7 +134,7 @@
 									:size 13))
 (setq doom-themes-treemacs-enable-variable-pitch nil)
 (add-to-list 'auth-sources "~/Dropbox/.authinfo")
-(setq igist-current-user-name "p2d0")
+(setq igist-current-user-name "p-720")
 
 ;; Fira Code
 ;; Fantasque Sans Mono

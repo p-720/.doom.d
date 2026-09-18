@@ -11,7 +11,7 @@
 (after! org-roam
   (setq org-roam-directory (expand-file-name "~/Dropbox/org/roam/"))
   (setq org-roam-node-default-sort 'file-mtime)
-	(add-hook 'org-roam-find-file-hook #'org-daily-setup-hook)
+	;; (add-hook 'org-roam-find-file-hook #'org-daily-setup-hook)
 
 	;; (add-hook! 'save-buffer)
 	;; (add-hook! 'after-save-hook )
@@ -48,12 +48,13 @@
                       :point pos
                       :properties properties))))))
 
-  (setq daily-template "~/Dropbox/org/daily.org")
-  (setq org-roam-dailies-capture-templates `(("j" "journal" plain "%?\n"
-																							 :if-new (file+head "%<%Y-%m-%d>.org" ,(format "%%[%s]" daily-template))
-																							 :immediate-finish t
-																							 :unnarrowed t
-																							 )))
+  ;; (setq daily-template "~/Dropbox/org/daily.org")
+  ;; (setq org-roam-dailies-capture-templates `(("j" "journal" plain "%?\n"
+	;; 																						 :if-new (file+head "%<%Y-%m-%d>.org" ,(format "%%[%s]" daily-template))
+	;; 																						 :immediate-finish t
+	;; 																						 :unnarrowed t
+	;; 																						 )))
+
   (setq org-roam-capture-templates '(("d" "default" plain "%?"
 																			 :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
 																								 "#+title: ${title}\n")
